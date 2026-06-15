@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}مدير الإعلانات - Marketing OS{% endblock %}
+{% block content %}
+<div class="tool-header"><h1>📢 مدير الإعلانات</h1><p>استراتيجيات ونصوص إعلانية احترافية</p></div>
+<div class="tool-section">
+<div class="tool-card"><h3>📊 استراتيجية إعلانات</h3>
+<div class="form-group"><label>المنصة</label><select id="ad-platform" class="input-field"><option>facebook</option><option>google</option><option>linkedin</option><option>instagram</option></select></div>
+<div class="form-group"><label>المنتج/الخدمة</label><input id="ad-product" class="input-field"></div>
+<div class="form-group"><label>الميزانية</label><input id="ad-budget" class="input-field" placeholder="$"></div>
+<button onclick="strategy()" class="btn btn-primary">توليد استراتيجية</button>
+</div>
+<div class="tool-card"><h3>✍️ نص إعلاني (Ad Copy)</h3>
+<div class="form-group"><label>المنصة</label><select id="copy-platform" class="input-field"><option>facebook</option><option>google</option><option>linkedin</option><option>instagram</option></select></div>
+<div class="form-group"><label>المنتج</label><input id="copy-product" class="input-field"></div>
+<div class="form-group"><label>العرض</label><input id="copy-offer" class="input-field" placeholder="خصم 20%، شحن مجاني..."></div>
+<button onclick="adCopy()" class="btn btn-primary">توليد نصوص</button>
+</div>
+<div class="tool-card" id="result-card" style="display:none;">
+<div class="form-group"><label>النتيجة</label><div id="result" class="result-box"></div></div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('result').textContent);alert('تم النسخ')" class="btn btn-ghost">نسخ</button>
+</div>
+</div>
+<script>
+async function callApi(endpoint,data){
+  const btn=event.target;btn.disabled=true;btn.textContent='جارٍ...';
+  const res=await fetch('/plugin/ad-manager/'+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const d=await res.json();btn.disabled=false;btn.textContent=btn.textContent.replace('جارٍ...','');
+  if(d.error){alert(d.error);return;}
+  document.getElementById('result').textContent=d.result;
+  document.getElementById('result-card').style.display='block';
+}
+function strategy(){callApi('strategy',{platform:document.getElementById('ad-platform').value,product:document.getElementById('ad-product').value,budget:document.getElementById('ad-budget').value})}
+function adCopy(){callApi('copy',{platform:document.getElementById('copy-platform').value,product:document.getElementById('copy-product').value,offer:document.getElementById('copy-offer').value})}
+</script>
+{% endblock %}

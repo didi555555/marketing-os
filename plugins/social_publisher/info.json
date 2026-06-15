@@ -1,0 +1,7 @@
+{
+    "name": "الناشر الاجتماعي",
+    "description": "إنشاء وجدولة منشورات التواصل الاجتماعي",
+    "icon": "📱",
+    "route": "social-publisher",
+    "version": "1.0.0"
+}

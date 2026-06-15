@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}استوديو الوسائط - Marketing OS{% endblock %}
+{% block content %}
+<div class="tool-header"><h1>🎨 استوديو الوسائط</h1><p>توليد الصور والمستندات بضغطة زر</p></div>
+<div class="tool-section">
+<div class="tool-card">
+<h3>🖼️ توليد صورة</h3>
+<form method="POST" action="/plugin/media-studio/generate-image" target="_blank">
+<div class="form-group"><label>وصف الصورة</label><input type="text" name="prompt" class="input-field" placeholder="مثال: جبنة مضفرة سودانية"></div>
+<button class="btn btn-primary">توليد الصورة</button>
+</form>
+</div>
+<div class="tool-card">
+<h3>📄 DOCX (Word)</h3>
+<form method="POST" action="/plugin/media-studio/generate-docx">
+<div class="form-group"><label>العنوان</label><input type="text" name="title" class="input-field"></div>
+<div class="form-group"><label>المحتوى</label><textarea name="body" class="input-field textarea" rows="4"></textarea></div>
+<button class="btn btn-primary">تحميل DOCX</button>
+</form>
+</div>
+<div class="tool-card">
+<h3>📕 PDF</h3>
+<form method="POST" action="/plugin/media-studio/generate-pdf">
+<div class="form-group"><label>العنوان</label><input type="text" name="title" class="input-field"></div>
+<div class="form-group"><label>المحتوى</label><textarea name="body" class="input-field textarea" rows="4"></textarea></div>
+<button class="btn btn-primary">تحميل PDF</button>
+</form>
+</div>
+<div class="tool-card">
+<h3>📽️ PPTX (عرض تقديمي)</h3>
+<form method="POST" action="/plugin/media-studio/generate-pptx">
+<div class="form-group"><label>العنوان</label><input type="text" name="title" class="input-field"></div>
+<div class="form-group"><label>المحتوى (سطر = شريحة)</label><textarea name="slides" class="input-field textarea" rows="4" placeholder="شريحة 1&#10;نقطة 1&#10;نقطة 2&#10;شريحة 2&#10;..."></textarea></div>
+<button class="btn btn-primary">تحميل PPTX</button>
+</form>
+</div>
+<div class="tool-card">
+<h3>📊 XLSX (Excel)</h3>
+<form method="POST" action="/plugin/media-studio/generate-xlsx">
+<div class="form-group"><label>البيانات (CSV)</label><textarea name="data" class="input-field textarea" rows="4" placeholder="المنتج,السعر,الكمية&#10;منتج أ,100,5"></textarea></div>
+<button class="btn btn-primary">تحميل XLSX</button>
+</form>
+</div>
+</div>
+{% endblock %}

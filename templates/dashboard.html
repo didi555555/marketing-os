@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}لوحة التحكم - Marketing OS{% endblock %}
+{% block content %}
+<div class="dashboard-header">
+    <h1>لوحة التحكم <span>✦</span></h1>
+    <p>منصة التسويق المتكاملة - كل أدواتك في مكان واحد</p>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div class="stat-icon gold">🛠️</div>
+        </div>
+        <div class="stat-value">{{ plugins|length }}</div>
+        <div class="stat-label">الأدوات النشطة</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div class="stat-icon blue">📝</div>
+        </div>
+        <div class="stat-value">{% if stats.content_count %}{{ stats.content_count }}{% else %}0{% endif %}</div>
+        <div class="stat-label">المحتوى المُنشأ</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div class="stat-icon green">📤</div>
+        </div>
+        <div class="stat-value">{% if stats.posts_count %}{{ stats.posts_count }}{% else %}0{% endif %}</div>
+        <div class="stat-label">المنشورات المجدولة</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div class="stat-icon red">🔍</div>
+        </div>
+        <div class="stat-value">{% if stats.keywords_count %}{{ stats.keywords_count }}{% else %}0{% endif %}</div>
+        <div class="stat-label">الكلمات المفتاحية</div>
+    </div>
+</div>
+
+<div class="row-split">
+    <div class="chart-card">
+        <h3>📈 نشاط الأيام السبعة الأخيرة</h3>
+        <div class="chart-bars" id="chartDays">
+            {% set days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'] %}
+            {% set vals = stats.weekly_activity or [3,7,2,5,8,4,6] %}
+            {% set max_val = vals|max or 1 %}
+            {% for i in range(7) %}
+            <div class="chart-bar-group">
+                <div class="chart-bar" style="height: {{ (vals[i] / max_val * 160)|round }}px;" title="{{ vals[i] }}"></div>
+                <div class="chart-label">{{ days[i % 7] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="activity-card">
+        <h3>⚡ آخر النشاطات</h3>
+        <div class="activity-list">
+            {% if stats.recent_activity %}
+                {% for item in stats.recent_activity %}
+                <div class="activity-item">
+                    <span class="activity-dot {{ item.color or 'gold' }}"></span>
+                    <span class="activity-text">{{ item.text|safe }}</span>
+                    <span class="activity-time">{{ item.time }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="activity-item">
+                    <span class="activity-dot gold"></span>
+                    <span class="activity-text">مرحباً بك! ابدأ باستخدام الأدوات المتاحة</span>
+                    <span class="activity-time">الآن</span>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-dot blue"></span>
+                    <span class="activity-text">لوحة التحكم جاهزة لاستقبال أول نشاط لك</span>
+                    <span class="activity-time">—</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="quick-links">
+    <h3>🔗 أدوات سريعة</h3>
+    <div class="plugins-grid">
+        {% if plugins %}
+            {% for name, info in plugins.items() %}
+            <a href="/plugin/{{ info.route }}" class="plugin-card">
+                <div class="plugin-icon">{{ info.icon or '🧩' }}</div>
+                <h3>{{ info.name }}</h3>
+                <p>{{ info.description }}</p>
+            </a>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="icon">🎉</div>
+                <h2>مرحباً بك!</h2>
+                <p>ابدأ بإضافة أول أداة من صفحة الإعدادات.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

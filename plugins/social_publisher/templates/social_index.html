@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}الناشر الاجتماعي - Marketing OS{% endblock %}
+{% block content %}
+<div class="tool-header"><h1>📱 الناشر الاجتماعي</h1><p>إنشاء منشورات احترافية لوسائل التواصل الاجتماعي</p></div>
+<div class="tool-section">
+<div class="tool-card">
+<div class="form-group"><label>المنصة</label>
+<select id="platform" class="input-field">
+<option value="facebook">فيسبوك</option><option value="twitter">تويتر/X</option>
+<option value="linkedin">لينكدإن</option><option value="instagram">إنستغرام</option>
+<option value="tiktok">تيك توك</option>
+</select></div>
+<div class="form-group"><label>الموضوع</label><textarea id="topic" class="input-field textarea" rows="4" placeholder="وصف المنشور أو الموضوع"></textarea></div>
+<button onclick="generate()" class="btn btn-primary">توليد المنشور</button>
+</div>
+<div class="tool-card" id="result-card" style="display:none;">
+<div class="form-group"><label>المنشور</label><div id="result" class="result-box"></div></div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('result').textContent);alert('تم النسخ')" class="btn btn-ghost">نسخ</button>
+</div>
+</div>
+<script>
+async function generate(){
+  const topic=document.getElementById('topic').value;
+  const platform=document.getElementById('platform').value;
+  if(!topic){alert('اكتب الموضوع');return;}
+  const btn=event.target;btn.disabled=true;btn.textContent='جارٍ...';
+  const res=await fetch('/plugin/social-publisher/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic,platform})});
+  const data=await res.json();
+  btn.disabled=false;btn.textContent='توليد المنشور';
+  if(data.error){alert(data.error);return;}
+  document.getElementById('result').textContent=data.result;
+  document.getElementById('result-card').style.display='block';
+}
+</script>
+{% endblock %}

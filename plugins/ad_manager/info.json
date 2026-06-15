@@ -1,0 +1,7 @@
+{
+    "name": "مدير الإعلانات",
+    "description": "إدارة حملات إعلانية (Google, Facebook, LinkedIn)",
+    "icon": "📢",
+    "route": "ad-manager",
+    "version": "1.0.0"
+}

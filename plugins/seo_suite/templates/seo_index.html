@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}حزمة SEO - Marketing OS{% endblock %}
+{% block content %}
+<div class="tool-header"><h1>🔍 حزمة SEO</h1><p>تدقيق وتحسين محركات البحث</p></div>
+<div class="tool-section">
+<div class="tool-card"><h3>📋 تدقيق SEO</h3>
+<div class="form-group"><label>رابط الموقع</label><input id="seo-url" class="input-field" placeholder="https://example.com"></div>
+<div class="form-group"><label>الكلمات المفتاحية</label><input id="seo-kw" class="input-field" placeholder="كلمة مفتاحية 1, كلمة 2"></div>
+<button onclick="seoAudit()" class="btn btn-primary">تدقيق</button>
+</div>
+<div class="tool-card"><h3>🤖 تحسين AI SEO</h3>
+<div class="form-group"><label>المحتوى</label><textarea id="ai-content" class="input-field textarea" rows="4"></textarea></div>
+<button onclick="aiSeo()" class="btn btn-primary">تحسين</button>
+</div>
+<div class="tool-card"><h3>🏷️ Schema Generator</h3>
+<div class="form-group"><label>نوع الصفحة</label><select id="schema-type" class="input-field"><option>Product</option><option>Article</option><option>LocalBusiness</option><option>FAQPage</option><option>Event</option></select></div>
+<div class="form-group"><label>التفاصيل</label><textarea id="schema-details" class="input-field textarea" rows="4" placeholder="اسم المنتج، السعر، الوصف..."></textarea></div>
+<button onclick="schemaGen()" class="btn btn-primary">توليد Schema</button>
+</div>
+<div class="tool-card" id="result-card" style="display:none;">
+<div class="form-group"><label>النتيجة</label><div id="result" class="result-box"></div></div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('result').textContent);alert('تم النسخ')" class="btn btn-ghost">نسخ</button>
+</div>
+</div>
+<script>
+async function callApi(endpoint,data){
+  const btn=event.target;btn.disabled=true;btn.textContent='جارٍ...';
+  const res=await fetch('/plugin/seo-suite/'+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const d=await res.json();btn.disabled=false;btn.textContent=btn.textContent.replace('جارٍ...','');
+  if(d.error){alert(d.error);return;}
+  document.getElementById('result').textContent=d.result;
+  document.getElementById('result-card').style.display='block';
+}
+function seoAudit(){callApi('audit',{url:document.getElementById('seo-url').value,keywords:document.getElementById('seo-kw').value})}
+function aiSeo(){callApi('ai-seo',{content:document.getElementById('ai-content').value})}
+function schemaGen(){callApi('schema',{page_type:document.getElementById('schema-type').value,details:document.getElementById('schema-details').value})}
+</script>
+{% endblock %}

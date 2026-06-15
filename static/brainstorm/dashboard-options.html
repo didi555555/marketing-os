@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تصاميم Dashboard - Marketing OS</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 30px; }
+  h1 { text-align: center; margin-bottom: 10px; color: #f0c040; font-size: 28px; }
+  .subtitle { text-align: center; margin-bottom: 30px; color: #aaa; font-size: 16px; }
+  .options { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .option { background: #16213e; border: 2px solid #2a2a4a; border-radius: 16px; padding: 0; width: 320px; cursor: pointer; transition: all 0.3s; overflow: hidden; flex-shrink: 0; }
+  .option:hover { border-color: #f0c040; transform: translateY(-4px); box-shadow: 0 8px 30px rgba(240,192,64,0.15); }
+  .option.selected { border-color: #f0c040; box-shadow: 0 0 20px rgba(240,192,64,0.3); }
+  .preview { padding: 20px; background: #0f3460; min-height: 200px; }
+  .info { padding: 16px 20px; }
+  .info h3 { font-size: 18px; margin-bottom: 6px; }
+  .info p { font-size: 13px; color: #aaa; line-height: 1.5; }
+  .letter { display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center; background: #f0c040; color: #1a1a2e; border-radius: 50%; font-weight: bold; font-size: 14px; margin-bottom: 10px; }
+
+  /* Mockup Styles */
+  .mock-dash { display: flex; border-radius: 8px; overflow: hidden; height: 160px; }
+  .mock-sidebar { width: 50px; background: #1a1a2e; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .mock-icon { width: 20px; height: 20px; background: #2a2a4a; border-radius: 6px; }
+  .mock-icon.active { background: #f0c040; }
+  .mock-main { flex: 1; background: #0f3460; padding: 10px; }
+  .mock-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .mock-stat { width: 30px; height: 8px; background: #f0c040; border-radius: 4px; }
+  .mock-row { display: flex; gap: 6px; margin-bottom: 6px; }
+  .mock-box { flex: 1; height: 40px; background: #1a1a2e; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px; }
+  .mock-box .num { width: 20px; height: 4px; background: #f0c040; border-radius: 2px; margin-bottom: 3px; }
+  .mock-box .lbl { width: 30px; height: 3px; background: #555; border-radius: 2px; }
+  .mock-chart { height: 35px; margin-top: 4px; display: flex; align-items: flex-end; gap: 3px; }
+  .mock-bar { flex: 1; background: #f0c040; border-radius: 2px 2px 0 0; min-height: 4px; }
+  .mock-list { margin-top: 6px; }
+  .mock-item { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+  .mock-dot { width: 6px; height: 6px; background: #f0c040; border-radius: 50%; }
+  .mock-line { flex: 1; height: 4px; background: #2a2a4a; border-radius: 2px; }
+  .mock-line.wide { width: 60%; }
+
+  /* Grid Dashboard */
+  .grid-dash { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; height: 160px; }
+  .grid-stat { background: #1a1a2e; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; }
+  .grid-stat .num { width: 24px; height: 6px; background: #f0c040; border-radius: 3px; margin-bottom: 4px; }
+  .grid-stat .lbl { width: 35px; height: 3px; background: #555; border-radius: 2px; }
+  .grid-wide { grid-column: 1 / -1; background: #1a1a2e; border-radius: 6px; padding: 8px; display: flex; gap: 6px; align-items: flex-end; }
+  .grid-wide .bar { flex: 1; background: #f0c040; border-radius: 2px 2px 0 0; min-height: 4px; }
+  .grid-wide .bar:nth-child(2) { height: 30px !important; }
+
+  /* Sidebar Dashboard */
+  .side-dash { display: flex; height: 160px; }
+  .side-nav { width: 100px; background: #1a1a2e; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .side-nav-item { height: 6px; background: #2a2a4a; border-radius: 3px; }
+  .side-nav-item.active { background: #f0c040; width: 60%; }
+  .side-content { flex: 1; background: #0f3460; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .side-stats { display: flex; gap: 6px; }
+  .side-stat { flex: 1; height: 50px; background: #1a1a2e; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .side-stat .num { width: 30px; height: 5px; background: #f0c040; border-radius: 2px; }
+  .side-stat .lbl { width: 20px; height: 3px; background: #555; border-radius: 2px; }
+
+  .badge { display: inline-block; background: #f0c040; color: #1a1a2e; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; margin-right: 8px; }
+  .recommended { border-color: #f0c040 !important; position: relative; }
+  .recommended::after { content: '★ موصى به'; position: absolute; top: 10px; left: 10px; background: #f0c040; color: #1a1a2e; font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: bold; }
+  .action-bar { text-align: center; margin-top: 30px; }
+  .btn { background: #f0c040; color: #1a1a2e; border: none; padding: 12px 40px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+  .btn:hover { background: #ffd700; transform: scale(1.03); }
+</style>
+</head>
+<body>
+<h1>اختر تصميم Dashboard</h1>
+<p class="subtitle">اختر التصميم اللي يعجبك عشان نطبقه على Marketing OS</p>
+
+<div class="options">
+  <div class="option recommended" onclick="select(this,'a')">
+    <div class="preview">
+      <div class="mock-dash">
+        <div class="mock-sidebar">
+          <div class="mock-icon active"></div>
+          <div class="mock-icon"></div>
+          <div class="mock-icon"></div>
+          <div class="mock-icon"></div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-header">
+            <div class="mock-stat"></div>
+            <div class="mock-stat" style="width:60px"></div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-box"><div class="num"></div><div class="lbl"></div></div>
+            <div class="mock-box"><div class="num"></div><div class="lbl"></div></div>
+            <div class="mock-box"><div class="num"></div><div class="lbl"></div></div>
+            <div class="mock-box"><div class="num"></div><div class="lbl"></div></div>
+          </div>
+          <div class="mock-chart">
+            <div class="mock-bar" style="height:30px"></div>
+            <div class="mock-bar" style="height:20px"></div>
+            <div class="mock-bar" style="height:35px"></div>
+            <div class="mock-bar" style="height:15px"></div>
+            <div class="mock-bar" style="height:28px"></div>
+            <div class="mock-bar" style="height:22px"></div>
+          </div>
+          <div class="mock-list">
+            <div class="mock-item"><div class="mock-dot"></div><div class="mock-line"></div></div>
+            <div class="mock-item"><div class="mock-dot"></div><div class="mock-line wide"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="letter">أ</div>
+      <h3>Dashboard كلاسيكي <span class="badge">موصى به</span></h3>
+      <p>شريط جانبي أيقونات + إحصائيات 4 بطاقات + رسم بياني + آخر النشاطات. تصميم مألوف وبسيط.</p>
+    </div>
+  </div>
+
+  <div class="option" onclick="select(this,'b')">
+    <div class="preview">
+      <div class="grid-dash">
+        <div class="grid-stat"><div class="num"></div><div class="lbl"></div></div>
+        <div class="grid-stat"><div class="num"></div><div class="lbl"></div></div>
+        <div class="grid-stat"><div class="num"></div><div class="lbl"></div></div>
+        <div class="grid-stat"><div class="num"></div><div class="lbl"></div></div>
+        <div class="grid-wide">
+          <div class="bar" style="height:12px"></div>
+          <div class="bar" style="height:18px"></div>
+          <div class="bar" style="height:30px"></div>
+          <div class="bar" style="height:22px"></div>
+          <div class="bar" style="height:35px"></div>
+          <div class="bar" style="height:15px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="letter">ب</div>
+      <h3>Dashboard Grid</h3>
+      <p>شبكة كروت + رسم بياني يمتد بعرض الصفحة. بسيط وواضح بدون شريط جانبي.</p>
+    </div>
+  </div>
+
+  <div class="option" onclick="select(this,'c')">
+    <div class="preview">
+      <div class="side-dash">
+        <div class="side-nav">
+          <div class="side-nav-item active"></div>
+          <div class="side-nav-item"></div>
+          <div class="side-nav-item"></div>
+          <div class="side-nav-item"></div>
+          <div class="side-nav-item"></div>
+        </div>
+        <div class="side-content">
+          <div class="mock-header"><div class="mock-stat"></div></div>
+          <div class="side-stats">
+            <div class="side-stat"><div class="num"></div><div class="lbl"></div></div>
+            <div class="side-stat"><div class="num"></div><div class="lbl"></div></div>
+            <div class="side-stat"><div class="num"></div><div class="lbl"></div></div>
+          </div>
+          <div class="mock-chart" style="height:30px">
+            <div class="mock-bar" style="height:20px"></div>
+            <div class="mock-bar" style="height:30px"></div>
+            <div class="mock-bar" style="height:15px"></div>
+            <div class="mock-bar" style="height:28px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="letter">ج</div>
+      <h3>Dashboard جانبي</h3>
+      <p>قائمة جانبية موسعة مع محتوى رئيسي. يناسب الأدوات الكثيرة والمحتوى التفصيلي.</p>
+    </div>
+  </div>
+</div>
+
+<div class="action-bar">
+  <button class="btn" onclick="confirmChoice()">أرسل اختياري</button>
+</div>
+
+<script>
+let selected = 'a';
+function select(el, choice) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selected = choice;
+}
+function confirmChoice() {
+  const names = {a:'كلاسيكي', b:'Grid', c:'جانبي'};
+  const msg = selected === 'a' ? 'كلاسيكي (موصى به)' : names[selected];
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:80vh"><p style="font-size:24px;color:#f0c040">✅ اخترت: ' + msg + '<br><span style="font-size:16px;color:#aaa">عد للترمنال وأخبرني</span></p></div>';
+}
+</script>
+</body>
+</html>

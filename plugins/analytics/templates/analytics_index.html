@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}التحليلات - Marketing OS{% endblock %}
+{% block content %}
+<div class="tool-header"><h1>📊 التحليلات</h1><p>تحليل المنافسين وسيكولوجية التسويق</p></div>
+<div class="tool-section">
+<div class="tool-card"><h3>🏢 تحليل المنافسين</h3>
+<div class="form-group"><label>المنافسون (روابط أو أسماء)</label><textarea id="competitors" class="input-field textarea" rows="3" placeholder="منافس 1، منافس 2"></textarea></div>
+<div class="form-group"><label>المجال</label><input id="industry" class="input-field" placeholder="مثال: التجارة الإلكترونية"></div>
+<button onclick="competitor()" class="btn btn-primary">تحليل</button>
+</div>
+<div class="tool-card"><h3>🧠 سيكولوجية التسويق</h3>
+<div class="form-group"><label>المنتج/الخدمة</label><input id="psych-product" class="input-field" placeholder="وصف المنتج"></div>
+<div class="form-group"><label>الجمهور المستهدف</label><input id="psych-audience" class="input-field" placeholder="الشباب، ربات البيوت..."></div>
+<button onclick="psychology()" class="btn btn-primary">تحليل نفسي</button>
+</div>
+<div class="tool-card" id="result-card" style="display:none;">
+<div class="form-group"><label>النتيجة</label><div id="result" class="result-box"></div></div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('result').textContent);alert('تم النسخ')" class="btn btn-ghost">نسخ</button>
+</div>
+</div>
+<script>
+async function callApi(endpoint,data){
+  const btn=event.target;btn.disabled=true;btn.textContent='جارٍ...';
+  const res=await fetch('/plugin/analytics/'+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const d=await res.json();btn.disabled=false;btn.textContent=btn.textContent.replace('جارٍ...','');
+  if(d.error){alert(d.error);return;}
+  document.getElementById('result').textContent=d.result;
+  document.getElementById('result-card').style.display='block';
+}
+function competitor(){callApi('competitor',{competitors:document.getElementById('competitors').value,industry:document.getElementById('industry').value})}
+function psychology(){callApi('psychology',{product:document.getElementById('psych-product').value,audience:document.getElementById('psych-audience').value})}
+</script>
+{% endblock %}

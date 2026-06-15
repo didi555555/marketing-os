@@ -1,0 +1,25 @@
+# Environment
+.env
+venv/
+*.pyc
+__pycache__/
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database
+instance/*.db
+
+# Generated files
+static/uploads/
+*.egg-info/
+dist/
+build/
+
+# OS
+Thumbs.db
+.DS_Store

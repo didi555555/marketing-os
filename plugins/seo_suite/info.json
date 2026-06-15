@@ -1,0 +1,7 @@
+{
+    "name": "حزمة SEO",
+    "description": "تدقيق SEO، تحسين لمحركات الذكاء الاصطناعي",
+    "icon": "🔍",
+    "route": "seo-suite",
+    "version": "1.0.0"
+}

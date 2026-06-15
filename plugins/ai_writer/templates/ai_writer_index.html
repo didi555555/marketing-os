@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}الكاتب الذكي - Marketing OS{% endblock %}
+{% block content %}
+<div class="tool-header">
+    <h1>✍️ الكاتب الذكي</h1>
+    <p>كتابة وتحرير النصوص التسويقية بالذكاء الاصطناعي</p>
+</div>
+
+<div class="tool-section">
+    <div class="tool-card">
+        <div class="form-group">
+            <label>نوع المهمة</label>
+            <select id="mode" class="input-field">
+                <option value="copywriting">📝 كتابة إعلانية (Copywriting)</option>
+                <option value="editing">✏️ تحرير وتحسين (Copy Editing)</option>
+                <option value="strategy">📊 استراتيجية محتوى (Content Strategy)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>المدخلات / النص</label>
+            <textarea id="prompt" class="input-field textarea" rows="6" placeholder="اكتب وصف المنتج، الفكرة، أو النص المطلوب تحريره..."></textarea>
+        </div>
+        <button onclick="generate()" class="btn btn-primary">توليد النص</button>
+    </div>
+
+    <div class="tool-card" id="result-card" style="display:none;">
+        <div class="form-group">
+            <label>النتيجة</label>
+            <div id="result" class="result-box"></div>
+        </div>
+        <button onclick="copyResult()" class="btn btn-ghost">نسخ النتيجة</button>
+    </div>
+</div>
+
+<script>
+async function generate() {
+    const prompt = document.getElementById('prompt').value;
+    const mode = document.getElementById('mode').value;
+    if (!prompt) { alert('الرجاء كتابة النص المطلوب'); return; }
+
+    const btn = event.target;
+    btn.textContent = 'جارٍ التوليد...';
+    btn.disabled = true;
+
+    const res = await fetch('/plugin/ai-writer/generate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({prompt, mode})
+    });
+    const data = await res.json();
+
+    btn.textContent = 'توليد النص';
+    btn.disabled = false;
+
+    if (data.error) {
+        alert(data.error);
+        return;
+    }
+
+    document.getElementById('result').textContent = data.result;
+    document.getElementById('result-card').style.display = 'block';
+}
+
+function copyResult() {
+    const text = document.getElementById('result').textContent;
+    navigator.clipboard.writeText(text);
+    alert('تم النسخ!');
+}
+</script>
+{% endblock %}

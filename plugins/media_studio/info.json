@@ -1,0 +1,7 @@
+{
+    "name": "استوديو الوسائط",
+    "description": "توليد الصور والمستندات (DOCX, PDF, PPTX, XLSX)",
+    "icon": "🎨",
+    "route": "media-studio",
+    "version": "1.0.0"
+}

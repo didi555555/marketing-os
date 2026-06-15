@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}المخطط التسويقي - Marketing OS{% endblock %}
+{% block content %}
+<div class="tool-header"><h1>📋 المخطط التسويقي</h1><p>خطط تسويقية، وضع منتج، عصف ذهني</p></div>
+<div class="tool-section">
+<div class="tool-card"><h3>📈 خطة تسويقية</h3>
+<div class="form-group"><label>الشركة/المشروع</label><input id="mplan-biz" class="input-field"></div>
+<div class="form-group"><label>الميزانية التقريبية</label><input id="mplan-budget" class="input-field" placeholder="$"></div>
+<button onclick="marketingPlan()" class="btn btn-primary">توليد الخطة</button>
+</div>
+<div class="tool-card"><h3>🎯 تحليل وضع المنتج</h3>
+<div class="form-group"><label>المنتج</label><input id="pm-product" class="input-field"></div>
+<div class="form-group"><label>المميزات</label><textarea id="pm-features" class="input-field textarea" rows="3"></textarea></div>
+<button onclick="productMarket()" class="btn btn-primary">تحليل</button>
+</div>
+<div class="tool-card"><h3>💡 عصف ذهني</h3>
+<div class="form-group"><label>الموضوع</label><input id="brain-topic" class="input-field"></div>
+<div class="form-group"><label>الهدف</label><input id="brain-goal" class="input-field"></div>
+<button onclick="brainstorm()" class="btn btn-primary">توليد أفكار</button>
+</div>
+<div class="tool-card" id="result-card" style="display:none;">
+<div class="form-group"><label>النتيجة</label><div id="result" class="result-box"></div></div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('result').textContent);alert('تم النسخ')" class="btn btn-ghost">نسخ</button>
+</div>
+</div>
+<script>
+async function callApi(endpoint,data){
+  const btn=event.target;btn.disabled=true;btn.textContent='جارٍ...';
+  const res=await fetch('/plugin/planner/'+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const d=await res.json();btn.disabled=false;btn.textContent=btn.textContent.replace('جارٍ...','');
+  if(d.error){alert(d.error);return;}
+  document.getElementById('result').textContent=d.result;
+  document.getElementById('result-card').style.display='block';
+}
+function marketingPlan(){callApi('marketing-plan',{business:document.getElementById('mplan-biz').value,budget:document.getElementById('mplan-budget').value})}
+function productMarket(){callApi('product-market',{product:document.getElementById('pm-product').value,features:document.getElementById('pm-features').value})}
+function brainstorm(){callApi('brainstorm',{topic:document.getElementById('brain-topic').value,goal:document.getElementById('brain-goal').value})}
+</script>
+{% endblock %}

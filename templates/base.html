@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Marketing OS{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="layout-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo">✦ Marketing <span>OS</span></div>
+                <nav class="nav-menu">
+                    <a href="{{ url_for('dashboard') }}" class="nav-item {{ 'active' if request.endpoint == 'dashboard' else '' }}">
+                        <span class="icon">📊</span> لوحة التحكم
+                    </a>
+                    <div class="nav-section-title">الأدوات</div>
+                    {% if plugins %}
+                        {% for name, info in plugins.items() %}
+                        <a href="/plugin/{{ info.route }}" class="nav-item {{ 'active' if request.path.startswith('/plugin/' + info.route) else '' }}">
+                            <span class="icon">{{ info.icon or '🧩' }}</span> {{ info.name }}
+                        </a>
+                        {% endfor %}
+                    {% endif %}
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <div style="padding: 8px 14px; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--gold); color: #1a1a2e; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">{{ current_user.name[0] }}</span>
+                    {{ current_user.name }}
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="nav-item logout">
+                    <span class="icon">🚪</span> تسجيل خروج
+                </a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <span class="topbar-badge">منصة تسويق متكاملة</span>
+                </div>
+                <div class="topbar-right">
+                    <span class="topbar-greeting">مرحباً، <strong>{{ current_user.name }}</strong></span>
+                </div>
+            </header>
+            <div class="content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    {% else %}
+    <div class="auth-wrapper">
+        {% block auth_content %}{% endblock %}
+    </div>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
