@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from google import genai
 from google.genai import errors as genai_errors
+from core.utils import strip_markdown
 
 bp = Blueprint('social_publisher', __name__, template_folder='templates',
                url_prefix='/plugin/social-publisher')
@@ -22,7 +23,7 @@ def generate():
 
     platform_names = {'facebook': 'فيسبوك', 'twitter': 'تويتر/X', 'linkedin': 'لينكدإن', 'instagram': 'إنستغرام', 'tiktok': 'تيك توك'}
     client = genai.Client(api_key=api_key)
-    prompt = f'اكتب منشور تسويقي احترافي لمنصة {platform_names.get(platform, platform)} بالعربية. الموضوع: {topic}'
+    prompt = f'اكتب منشور تسويقي احترافي لمنصة {platform_names.get(platform, platform)} بالعربية بدون تنسيق (لا نجوم، لا شرطات). الموضوع: {topic}'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -31,7 +32,7 @@ def generate():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 def register(app):
     app.register_blueprint(bp)

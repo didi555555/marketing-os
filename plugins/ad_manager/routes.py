@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from google import genai
 from google.genai import errors as genai_errors
+from core.utils import strip_markdown
 
 bp = Blueprint('ad_manager', __name__, template_folder='templates',
                url_prefix='/plugin/ad-manager')
@@ -22,7 +23,7 @@ def strategy():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'قدم استراتيجية إعلانات متكاملة لمنصة {platform} للمنتج: {product}. الميزانية: {budget}. بالعربية: الجمهور المستهدف، أنواع الإعلانات، نصائح للاستهداف، تحسين الحملة.'
+    prompt = f'قدم استراتيجية إعلانات متكاملة لمنصة {platform} للمنتج: {product}. الميزانية: {budget}. بالعربية: الجمهور المستهدف، أنواع الإعلانات، نصائح للاستهداف، تحسين الحملة. بدون تنسيق (لا نجوم، لا شرطات).'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -31,7 +32,7 @@ def strategy():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 @bp.route('/copy', methods=['POST'])
 @login_required
@@ -44,7 +45,7 @@ def copy():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'اكتب 3 نصوص إعلانية (Ad Copy) بالعربية لمنصة {platform} للمنتج: {product}. العرض: {offer}. كل نص يشمل: عنوان، وصف، دعوة للإجراء (CTA).'
+    prompt = f'اكتب 3 نصوص إعلانية (Ad Copy) بالعربية لمنصة {platform} للمنتج: {product}. العرض: {offer}. كل نص يشمل: عنوان، وصف، دعوة للإجراء (CTA). بدون تنسيق (لا نجوم، لا شرطات).'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -53,7 +54,7 @@ def copy():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 def register(app):
     app.register_blueprint(bp)

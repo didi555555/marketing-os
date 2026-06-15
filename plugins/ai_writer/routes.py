@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import login_required
 from google import genai
 from google.genai import errors as genai_errors
+from core.utils import strip_markdown
 
 ai_writer_bp = Blueprint('ai_writer', __name__, template_folder='templates',
                          url_prefix='/plugin/ai-writer')
@@ -22,9 +23,9 @@ def generate():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط. أضفه في ملف .env'}), 400
 
     system_prompts = {
-        'copywriting': 'أنت كاتب إعلانات محترف. اكتب نصاً تسويقياً مقنعاً ومناسباً للجمهور العربي.',
-        'editing': 'أنت محرر نصوص محترف. راجع النص التالي وحسّنه من حيث الوضوح والتأثير والإقناع.',
-        'strategy': 'أنت خبير استراتيجية محتوى. اقترح خطة محتوى متكاملة بناءً على المدخلات التالية.',
+        'copywriting': 'أنت كاتب إعلانات محترف. اكتب نصاً تسويقياً مقنعاً بدون استخدام أي تنسيق (لا نجوم، لا شرطات، لا علامات).',
+        'editing': 'أنت محرر نصوص محترف. راجع النص التالي وحسّنه بدون استخدام أي تنسيق (لا نجوم، لا شرطات، لا علامات).',
+        'strategy': 'أنت خبير استراتيجية محتوى. اكتب خطة محتوى كاملة بدون استخدام أي تنسيق (لا نجوم، لا شرطات، لا علامات).',
     }
 
     client = genai.Client(api_key=api_key)
@@ -42,7 +43,8 @@ def generate():
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
 
-    return jsonify({'result': response.text})
+    result = strip_markdown(response.text)
+    return jsonify({'result': result})
 
 def register(app):
     app.register_blueprint(ai_writer_bp)

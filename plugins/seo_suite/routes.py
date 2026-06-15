@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from google import genai
 from google.genai import errors as genai_errors
+from core.utils import strip_markdown
 
 bp = Blueprint('seo_suite', __name__, template_folder='templates',
                url_prefix='/plugin/seo-suite')
@@ -21,7 +22,7 @@ def audit():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'حلل SEO للموقع {url}. الكلمات المفتاحية: {keywords}. قدم تقريراً مفصلاً بالعربية يشمل: تحليل العنوان والوصف، الروابط، تحسين المحتوى، وسرعة الموقع، واقتراحات للتحسين.'
+    prompt = f'حلل SEO للموقع {url}. الكلمات المفتاحية: {keywords}. قدم تقريراً مفصلاً بالعربية يشمل: تحليل العنوان والوصف، الروابط، تحسين المحتوى، وسرعة الموقع، واقتراحات للتحسين. بدون تنسيق (لا نجوم، لا شرطات، لا أرقام).'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -30,7 +31,7 @@ def audit():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 @bp.route('/ai-seo', methods=['POST'])
 @login_required
@@ -41,7 +42,7 @@ def ai_seo():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'حسّن المحتوى التالي لظهوره في محركات البحث الذكية (AI Search مثل ChatGPT, Perplexity). أضف هيكلة مناسبة وإجابات مباشرة. المحتوى: {content}'
+    prompt = f'حسّن المحتوى التالي لظهوره في محركات البحث الذكية (AI Search مثل ChatGPT, Perplexity). أضف هيكلة مناسبة وإجابات مباشرة. بدون تنسيق (لا نجوم، لا شرطات). المحتوى: {content}'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -50,7 +51,7 @@ def ai_seo():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 @bp.route('/schema', methods=['POST'])
 @login_required
@@ -71,7 +72,7 @@ def schema():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 def register(app):
     app.register_blueprint(bp)

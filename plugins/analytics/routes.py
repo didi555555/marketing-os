@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from google import genai
 from google.genai import errors as genai_errors
+from core.utils import strip_markdown
 
 bp = Blueprint('analytics', __name__, template_folder='templates',
                url_prefix='/plugin/analytics')
@@ -21,7 +22,7 @@ def competitor():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'حلل المنافسين التاليين في مجال {industry}: {competitors}. قدم تحليلاً بالعربية يشمل: نقاط القوة والضعف، استراتيجيات التسويق، الجمهور المستهدف، وفرص التميز.'
+    prompt = f'حلل المنافسين التاليين في مجال {industry}: {competitors}. قدم تحليلاً بالعربية يشمل: نقاط القوة والضعف، استراتيجيات التسويق، الجمهور المستهدف، وفرص التميز. بدون تنسيق (لا نجوم، لا شرطات).'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -30,7 +31,7 @@ def competitor():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 @bp.route('/psychology', methods=['POST'])
 @login_required
@@ -42,7 +43,7 @@ def psychology():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'قدم تحليل سيكولوجي تسويقي للمنتج: {product} والجمهور: {audience}. اشرح بالعربية: المحفزات النفسية المؤثرة، التحيزات المعرفية، وكيفية تطبيق مبادئ الإقناع (Cialdini).'
+    prompt = f'قدم تحليل سيكولوجي تسويقي للمنتج: {product} والجمهور: {audience}. اشرح بالعربية: المحفزات النفسية المؤثرة، التحيزات المعرفية، وكيفية تطبيق مبادئ الإقناع (Cialdini). بدون تنسيق (لا نجوم، لا شرطات).'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -51,7 +52,7 @@ def psychology():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 def register(app):
     app.register_blueprint(bp)

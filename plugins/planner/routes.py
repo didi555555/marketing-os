@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from google import genai
 from google.genai import errors as genai_errors
+from core.utils import strip_markdown
 
 bp = Blueprint('planner', __name__, template_folder='templates',
                url_prefix='/plugin/planner')
@@ -21,7 +22,7 @@ def marketing_plan():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'ضع خطة تسويقية شاملة بالعربية للbusiness: {business} والميزانية: {budget}. شمل: الأهداف، الجمهور المستهدف، القنوات، خطة المحتوى، الميزانية، والجدول الزمني.'
+    prompt = f'ضع خطة تسويقية شاملة بالعربية للbusiness: {business} والميزانية: {budget}. شمل: الأهداف، الجمهور المستهدف، القنوات، خطة المحتوى، الميزانية، والجدول الزمني. بدون تنسيق (لا نجوم، لا شرطات).'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -30,7 +31,7 @@ def marketing_plan():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 @bp.route('/product-market', methods=['POST'])
 @login_required
@@ -42,7 +43,7 @@ def product_market():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'حلل وضع المنتج التالي: {product}. المميزات: {features}. قدم بالعربية: تحديد الجمهور المستهدف (ICP)، التمركز (Positioning)، البيان القيمي (Value Proposition).'
+    prompt = f'حلل وضع المنتج التالي: {product}. المميزات: {features}. قدم بالعربية: تحديد الجمهور المستهدف (ICP)، التمركز (Positioning)، البيان القيمي (Value Proposition). بدون تنسيق (لا نجوم، لا شرطات).'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -51,7 +52,7 @@ def product_market():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 @bp.route('/brainstorm', methods=['POST'])
 @login_required
@@ -63,7 +64,7 @@ def brainstorm():
         return jsonify({'error': 'مفتاح Gemini API غير مضبوط'}), 400
 
     client = genai.Client(api_key=api_key)
-    prompt = f'نفذ جلسة عصف ذهني للموضوع: {topic}. الهدف: {goal}. قدم 10 أفكار إبداعية بالعربية مع شرح مختصر لكل فكرة.'
+    prompt = f'نفذ جلسة عصف ذهني للموضوع: {topic}. الهدف: {goal}. قدم 10 أفكار إبداعية بالعربية بدون تنسيق (لا نجوم، لا شرطات) مع شرح مختصر لكل فكرة.'
     try:
         resp = client.models.generate_content(model='gemini-2.5-flash-lite', contents=prompt)
     except genai_errors.ClientError as e:
@@ -72,7 +73,7 @@ def brainstorm():
         return jsonify({'error': f'خطأ في Gemini API: {str(e)[:100]}'}), 500
     except Exception as e:
         return jsonify({'error': f'حدث خطأ في الاتصال بـ Gemini API: {str(e)[:100]}'}), 500
-    return jsonify({'result': resp.text})
+    return jsonify({'result': strip_markdown(resp.text)})
 
 def register(app):
     app.register_blueprint(bp)

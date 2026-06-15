@@ -20,7 +20,7 @@
             <label>المدخلات / النص</label>
             <textarea id="prompt" class="input-field textarea" rows="6" placeholder="اكتب وصف المنتج، الفكرة، أو النص المطلوب تحريره..."></textarea>
         </div>
-        <button onclick="generate()" class="btn btn-primary">توليد النص</button>
+        <button onclick="generate()" class="btn btn-gold">توليد النص</button>
     </div>
 
     <div class="tool-card" id="result-card" style="display:none;">
@@ -28,7 +28,8 @@
             <label>النتيجة</label>
             <div id="result" class="result-box"></div>
         </div>
-        <button onclick="copyResult()" class="btn btn-ghost">نسخ النتيجة</button>
+        <button onclick="copyResult()" class="btn btn-ghost" id="copyBtn">نسخ النتيجة</button>
+        <span id="copyMsg" style="color:var(--gold);font-size:13px;margin-right:10px;display:none;">تم النسخ ✓</span>
     </div>
 </div>
 
@@ -39,7 +40,7 @@ async function generate() {
     if (!prompt) { alert('الرجاء كتابة النص المطلوب'); return; }
 
     const btn = event.target;
-    btn.textContent = 'جارٍ التوليد...';
+    btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-left:6px;"></span> جارٍ التوليد...';
     btn.disabled = true;
 
     const res = await fetch('/plugin/ai-writer/generate', {
@@ -57,14 +58,29 @@ async function generate() {
         return;
     }
 
-    document.getElementById('result').textContent = data.result;
+    const resultEl = document.getElementById('result');
+    resultEl.textContent = data.result;
+    resultEl.style.whiteSpace = 'pre-wrap';
     document.getElementById('result-card').style.display = 'block';
 }
 
 function copyResult() {
     const text = document.getElementById('result').textContent;
-    navigator.clipboard.writeText(text);
-    alert('تم النسخ!');
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        const msg = document.getElementById('copyMsg');
+        msg.style.display = 'inline';
+        setTimeout(function() { msg.style.display = 'none'; }, 2000);
+    } catch (e) {
+        alert('تعذر النسخ، حدد النص يدوياً وانسخه Ctrl+C');
+    }
+    document.body.removeChild(textarea);
 }
 </script>
 {% endblock %}
