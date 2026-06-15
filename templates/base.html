@@ -43,6 +43,7 @@
                 </div>
                 <div class="topbar-right">
                     <span class="topbar-greeting">مرحباً، <strong>{{ current_user.name }}</strong></span>
+                    <span class="topbar-badge" id="reqCounter" title="الطلبات المتبقية من 20 كل دقيقة">20/20</span>
                 </div>
             </header>
             <div class="content">
@@ -63,5 +64,43 @@
     </div>
     {% endif %}
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    var reqTimestamps = [];
+    var reqLimit = 20;
+    var reqInterval = 60;
+
+    function trackRequest() {
+        var now = Date.now();
+        reqTimestamps.push(now);
+        reqTimestamps = reqTimestamps.filter(function(t) { return now - t < reqInterval * 1000; });
+        var remaining = Math.max(0, reqLimit - reqTimestamps.length);
+        var el = document.getElementById('reqCounter');
+        if (el) {
+            el.textContent = remaining + '/' + reqLimit;
+            el.style.background = remaining <= 3 ? 'var(--error)' : 'var(--gold)';
+            el.style.color = remaining <= 3 ? '#fff' : '#1a1a2e';
+        }
+    }
+
+    document.addEventListener('submit', function(e) {
+        var form = e.target;
+        if (form.action && form.action.includes('/plugin/')) {
+            var orig = form.onsubmit;
+            var btn = form.querySelector('.btn-gold, button[type="submit"]');
+            trackRequest();
+        }
+    });
+
+    var origFetch = window.fetch;
+    window.fetch = function() {
+        var url = arguments[0];
+        if (typeof url === 'string' && url.includes('/plugin/')) {
+            trackRequest();
+        } else if (url && url.url && url.url.includes('/plugin/')) {
+            trackRequest();
+        }
+        return origFetch.apply(this, arguments);
+    };
+    </script>
 </body>
 </html>
