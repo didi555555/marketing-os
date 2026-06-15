@@ -28,9 +28,24 @@ async function callApi(endpoint,data){
   const btn=event.target;btn.disabled=true;btn.textContent='جارٍ...';
   const res=await fetch('/plugin/planner/'+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
   const d=await res.json();btn.disabled=false;btn.textContent=btn.textContent.replace('جارٍ...','');
-  if(d.error){alert(d.error);return;}
+  if(d.error){if(d.retry_after){startCountdown(btn,d.retry_after);}else{alert(d.error);}return;}
   document.getElementById('result').textContent=d.result;
   document.getElementById('result-card').style.display='block';
+}
+function startCountdown(btn, seconds) {
+    btn.disabled = true;
+    var remaining = seconds;
+    btn.textContent = 'انتظر ' + remaining + ' ثانية...';
+    var timer = setInterval(function() {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(timer);
+            btn.textContent = 'توليد النص';
+            btn.disabled = false;
+        } else {
+            btn.textContent = 'انتظر ' + remaining + ' ثانية...';
+        }
+    }, 1000);
 }
 function marketingPlan(){callApi('marketing-plan',{business:document.getElementById('mplan-biz').value,budget:document.getElementById('mplan-budget').value})}
 function productMarket(){callApi('product-market',{product:document.getElementById('pm-product').value,features:document.getElementById('pm-features').value})}

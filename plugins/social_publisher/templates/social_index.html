@@ -27,9 +27,24 @@ async function generate(){
   const res=await fetch('/plugin/social-publisher/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic,platform})});
   const data=await res.json();
   btn.disabled=false;btn.textContent='توليد المنشور';
-  if(data.error){alert(data.error);return;}
+  if(data.error){if(data.retry_after){startCountdown(btn,data.retry_after);}else{alert(data.error);}return;}
   document.getElementById('result').textContent=data.result;
   document.getElementById('result-card').style.display='block';
+}
+function startCountdown(btn, seconds) {
+    btn.disabled = true;
+    var remaining = seconds;
+    btn.textContent = 'انتظر ' + remaining + ' ثانية...';
+    var timer = setInterval(function() {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(timer);
+            btn.textContent = 'توليد النص';
+            btn.disabled = false;
+        } else {
+            btn.textContent = 'انتظر ' + remaining + ' ثانية...';
+        }
+    }, 1000);
 }
 </script>
 {% endblock %}

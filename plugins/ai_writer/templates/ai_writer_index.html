@@ -54,7 +54,11 @@ async function generate() {
     btn.disabled = false;
 
     if (data.error) {
-        alert(data.error);
+        if (data.retry_after) {
+            startCountdown(btn, data.retry_after);
+        } else {
+            alert(data.error);
+        }
         return;
     }
 
@@ -62,6 +66,22 @@ async function generate() {
     resultEl.textContent = data.result;
     resultEl.style.whiteSpace = 'pre-wrap';
     document.getElementById('result-card').style.display = 'block';
+}
+
+function startCountdown(btn, seconds) {
+    btn.disabled = true;
+    var remaining = seconds;
+    btn.textContent = 'انتظر ' + remaining + ' ثانية...';
+    var timer = setInterval(function() {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(timer);
+            btn.textContent = 'توليد النص';
+            btn.disabled = false;
+        } else {
+            btn.textContent = 'انتظر ' + remaining + ' ثانية...';
+        }
+    }, 1000);
 }
 
 function copyResult() {
